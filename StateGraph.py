@@ -43,4 +43,4 @@ def create_graph(thread_id:str="1"):
     graph_builder.set_finish_point("chatbot")
 
     memory = MemorySaver()
-    return graph_builder.compile(checkpointer=memory, config={"configurable": {"thread_id": thread_id}})
+    return graph_builder.compile(checkpointer=memory), {"configurable": {"thread_id": thread_id}}
