@@ -22,20 +22,81 @@ def init_session():
 def welcome_page():
     st.markdown("""
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+         @keyframes gradientText {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            background-size: 200% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientText 6s ease infinite;
+        }
+        .fade-in {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Стеклянная кнопка Streamlit */
+        .stButton > button {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: #6366f1 !important;
+            font-weight: bold;
+            padding: 0.8em 2em;
+            border-radius: 1em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stButton > button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            color: #8b5cf6 !important;
+        }
+        
+        /* Фон страницы с градиентом для эффекта стекла */
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2, #6B8DD6);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
                 """, unsafe_allow_html=True)
     
     st.markdown("""
-        <div class="flex flex-col items-center justify-center min-h-[70vh] px-4 mt-14">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-12 text-gray-800">
+        <div class="flex flex-col items-center justify-center min-h-[70vh] px-4 mt-24">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 text-gray-800 gradient-text mx-auto">
             Welcome to your AI Assistant
         </h1>
-        <h4 class="text-lg md:text-xl lg:text-2xl text-gray-600 text-center mb-12 max-w-2xl">
+        <h4 class="text-lg md:text-xl lg:text-2xl text-gray-600 text-center mb-12 max-w-2xl gradient-text fade-in">
             I'm your AI assistant. Ask me anything!
         </p>
         </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([1, 1, 1])
     if col2.button("Let's Chat!", key="welcome_button", use_container_width=True):
         st.session_state.started = True
         st.rerun()
