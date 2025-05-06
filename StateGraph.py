@@ -44,3 +44,26 @@ def create_graph(thread_id:str="1"):
 
     memory = MemorySaver()
     return graph_builder.compile(checkpointer=memory), {"configurable": {"thread_id": thread_id}}
+
+class MessageHandler:
+    def __init__(self, thread_id:str = "1"):
+        self.graph, self.config = create_graph(thread_id)
+
+    def handle_message(self, message: str):
+        human_message = HumanMessage(content=message)
+        try:
+            response = self.graph.invoke({"messages": [human_message]})
+            return response["messages"][-1]
+
+        except:
+            ValueError("No response from graph")
+    
+    def get_history(self):
+        try:
+            state = self.graph.get_state()
+            return state.get("messages", [])
+        except:
+            ValueError("No history found")
+
+    def clear_history(self):
+        self.graph.reset()
