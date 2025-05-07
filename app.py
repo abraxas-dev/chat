@@ -87,10 +87,10 @@ def welcome_page():
     
     st.markdown("""
         <div class="flex flex-col items-center justify-center min-h-[70vh] px-4 mt-24">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 text-gray-800 gradient-text mx-auto">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-8 text-gray-800 gradient-text mx-auto text-center">
             Welcome to your AI Assistant
         </h1>
-        <h4 class="text-lg md:text-xl lg:text-2xl text-gray-600 text-center mb-12 max-w-2xl gradient-text fade-in">
+        <h4 class="text-lg md:text-xl lg:text-2xl text-gray-600 text-center mb-12 max-w-2xl gradient-text fade-in text-center">
             I'm your AI assistant. Ask me anything!
         </p>
         </div>
@@ -102,7 +102,74 @@ def welcome_page():
         st.rerun()
 
 def chat_page():
-    pass
+    # Add custom CSS for chat interface
+    st.markdown("""
+    <style>
+        .chat-message {
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message.user {
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .chat-message.assistant {
+            background-color: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .stTextInput > div > div > input {
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Initialize test messages if not exists
+    if "test_messages" not in st.session_state:
+        st.session_state.test_messages = [
+            HumanMessage(content="Привет! Как ты можешь мне помочь?"),
+            AIMessage(content="Здравствуйте! Я ваш AI ассистент. Я могу помочь вам с различными задачами, ответить на вопросы или просто поддержать беседу. Что вас интересует?"),
+            HumanMessage(content="Расскажи, что ты умеешь?"),
+            AIMessage(content="Я могу:\n- Отвечать на вопросы\n- Помогать с программированием\n- Анализировать данные\n- Поддерживать беседу на разные темы\nИ многое другое! Просто спросите, и я постараюсь помочь.")
+        ]
+
+    # Display chat messages
+    for message in st.session_state.test_messages:
+        if isinstance(message, HumanMessage):
+            st.markdown(f"""
+            <div class="chat-message user">
+                <div class="font-bold text-indigo-600">You:</div>
+                <div>{message.content}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        elif isinstance(message, AIMessage):
+            st.markdown(f"""
+            <div class="chat-message assistant">
+                <div class="font-bold text-purple-600">AI Assistant:</div>
+                <div>{message.content}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # Chat input
+    user_input = st.text_input("Type your message here...", key="chat_input")
+    
+    if user_input:
+        # Add user message
+        st.session_state.test_messages.append(HumanMessage(content=user_input))
+        
+        # Add dummy AI response
+        st.session_state.test_messages.append(
+            AIMessage(content="Это тестовый ответ. Реальная функциональность будет добавлена позже.")
+        )
+        
+        # Clear input
+        st.session_state.chat_input = ""
+        
+        # Rerun to update the chat display
+        st.rerun()
 
 def main():
     init_session()
