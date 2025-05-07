@@ -108,24 +108,44 @@ def chat_page():
     tavily_api_key = st.sidebar.text_input("Tavily API Key", type="password")
 
     # Getter for getting response from LLM's
-    def get_response(prompt):
-        response = random.choice(["Hello", "Hi", "Hey", "How are you?"])
-        for word in response.split():
-            yield word + " "
-            time.sleep(0.5)
+    def get_response():
+        try:
+            response = random.choice(["Hello", "Hi", "Hey", "How are you?"])
+            for word in response.split():
+                yield word + " "
+                time.sleep(0.5)
+        except Exception as e:
+            st.error(f"Error: {e}")
+            yield "Sorry, there was an error. Please try again later."
+    
+    def validate_api_keys():
+        if not openapi_api_key and not anthropic_api_key:
+            st.error("Please enter a valid API key for OpenAI or Anthropic.")
+            return False
+        if not tavily_api_key:
+            st.error("Please enter a valid API key for Tavily.")
+            return False
+        return True
 
         
     if "messages" not in st.session_state:
         st.session_state.messages = []
-
+    # Display history of messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+
+    # Get user input
     if prompt := st.chat_input("Enter a message..."):
+        if not validate_api_keys():
+            return
+        
+        # Display user message
         with st.chat_message("user"):
             st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
 
+        # Get response from LLM's
         with st.chat_message("assistant"):
             response = st.write_stream(get_response(prompt))
         st.session_state.messages.append({"role": "assistant", "content": response})
