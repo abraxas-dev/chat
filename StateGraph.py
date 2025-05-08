@@ -33,7 +33,6 @@ def create_graph(api_key:str = None, tavily_api_key:str = None):
                             model="anthropic:claude-3-5-sonnet-latest",
                             temperature=0.0,
                             api_key=api_key,
-                            system_message=system_message
     )
     
     tool = TavilySearch(max_results=3)
