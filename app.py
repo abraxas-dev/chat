@@ -1,5 +1,6 @@
+from pydantic import SecretStr
 import streamlit as st
-from StateGraph import create_graph, HumanMessage, AIMessage
+from StateGraph import MessageHandler, HumanMessage, AIMessage
 import uuid
 import time
 import random
@@ -18,8 +19,8 @@ def init_session():
         st.session_state.session_id = str(uuid.uuid4())
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    # if "graph" not in st.session_state:
-    #     st.session_state.graph, config = create_graph(st.session_state.session_id)
+    if "message_handler" not in st.session_state:
+        st.session_state.message_handler = None
 
 def welcome_page():
     st.markdown("""
@@ -108,12 +109,16 @@ def chat_page():
     tavily_api_key = st.sidebar.text_input("Tavily API Key", type="password")
 
     # Getter for getting response from LLM's
-    def get_response():
+    def get_response(prompt: str):
         try:
-            response = random.choice(["Hello", "Hi", "Hey", "How are you?"])
+            response = st.session_state.message_handler.handle_message(prompt)
+            if response is None:
+                st.error("Error: No response from LLM")
+                return
+            
             for word in response.split():
                 yield word + " "
-                time.sleep(0.5)
+                time.sleep(0.3)
         except Exception as e:
             st.error(f"Error: {e}")
             yield "Sorry, there was an error. Please try again later."
@@ -126,7 +131,29 @@ def chat_page():
             st.error("Please enter a valid API key for Tavily.")
             return False
         return True
+    
+    def initialize_message_handler():
+        if st.session_state.message_handler is None:
+            try:
 
+                if not tavily_api_key.strip():
+                    st.error("Tavily API key is required")
+                    return False
+                if not anthropic_api_key.strip():
+                    st.error("Anthropic API key is required")
+                    return False
+                
+                if anthropic_api_key and tavily_api_key:
+                    st.session_state.message_handler = MessageHandler(thread_id=st.session_state.session_id, api_key = anthropic_api_key.strip(), tavily_api_key = tavily_api_key.strip())
+                    return True
+                else:
+                    st.error("Please provide valid API keys for OpenAI or Anthropic and for Tavily.")
+                    return False
+                
+            except Exception as e:
+                st.error(f"Error Initializing AI Assistant: {e}")
+                return False 
+        return True 
         
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -139,7 +166,9 @@ def chat_page():
     if prompt := st.chat_input("Enter a message..."):
         if not validate_api_keys():
             return
-        
+        if not initialize_message_handler():
+            return
+
         # Display user message
         with st.chat_message("user"):
             st.markdown(prompt)
