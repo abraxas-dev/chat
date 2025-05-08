@@ -9,10 +9,10 @@ A learning project exploring the capabilities of LangGraph for building AI agent
 *Clean and modern welcome interface with gradient animations*
 
 ### Chat Interface
-| Initial Interaction | Search Capabilities |
+| Initial Setup | Search Capabilities |
 |:-------------------:|:-------------------:|
 | ![Chat Interface 1](images/chat-0.png) | ![Chat Interface 2](images/chat-1.png) |
-| *Basic interaction with the AI agent* | *Demonstrating web search and detailed responses* |
+| *API Key Configuration in the Sidebar* | *Demonstrating AI capabilities* |
 
 
 
