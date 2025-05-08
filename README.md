@@ -2,6 +2,20 @@
 
 A learning project exploring the capabilities of LangGraph for building AI agents and Streamlit for rapid UI development.
 
+## Interface Preview
+
+### Welcome Page
+![Welcome Page](images/main-0.png)
+*Clean and modern welcome interface with gradient animations*
+
+### Chat Interface
+| Initial Interaction | Search Capabilities |
+|:-------------------:|:-------------------:|
+| ![Chat Interface 1](images/chat-0.png) | ![Chat Interface 2](images/chat-1.png) |
+| *Basic interaction with the AI agent* | *Demonstrating web search and detailed responses* |
+
+
+
 ## Currently Features
 
 - 🤖 AI-powered chat interface using Anthropic's Claude model
