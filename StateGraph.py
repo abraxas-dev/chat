@@ -9,8 +9,9 @@ from langgraph.checkpoint.memory import MemorySaver
 from langchain.callbacks import StdOutCallbackHandler
 from langgraph.types import Command, interrupt 
 from langchain_core.tools import tool
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, SystemMessage
 from langchain_core.messages.base import BaseMessage
+from pydantic import SecretStr
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
@@ -18,19 +19,24 @@ class State(TypedDict):
 def chatbot(state: State, llm_with_tools):
     return {"messages": [llm_with_tools.invoke(state["messages"])]}
 
-def create_graph(thread_id:str="1"):
-    load_dotenv()
-    llm_api_key = os.getenv("ANTHROPIC_API_KEY")
-    tavily_api_key = os.getenv("TAVILY_API_KEY")
+def create_graph(api_key:str = None, tavily_api_key:str = None):
+    if not api_key or not tavily_api_key:
+        raise ValueError("API keys are not provided")
+    system_message = """You are a helpful assistant that can answer questions and help with tasks.
+    You are able to use the following tools:
+    - TavilySearch: to search the web for information"""
 
     graph_builder = StateGraph(State)
+    os.environ["TAVILY_API_KEY"] = tavily_api_key
 
     llm_call = init_chat_model(
-    model="anthropic:claude-3-5-sonnet-latest",
-    temperature=0.0,
-    api_key=llm_api_key
+                            model="anthropic:claude-3-5-sonnet-latest",
+                            temperature=0.0,
+                            api_key=api_key,
+                            system_message=system_message
     )
-    tool = TavilySearch(max_results=3, api_key=tavily_api_key)
+    
+    tool = TavilySearch(max_results=3)
     tools = [tool]
     llm_with_tools = llm_call.bind_tools(tools)
     tool_node = ToolNode(tools=tools)
@@ -43,27 +49,34 @@ def create_graph(thread_id:str="1"):
     graph_builder.set_finish_point("chatbot")
 
     memory = MemorySaver()
-    return graph_builder.compile(checkpointer=memory), {"configurable": {"thread_id": thread_id}}
+    return graph_builder.compile(checkpointer=memory)
 
 class MessageHandler:
-    def __init__(self, thread_id:str = "1"):
-        self.graph, self.config = create_graph(thread_id)
+    def __init__(self, thread_id:str = "1", api_key:str = None, tavily_api_key:str = None):
+        self.graph = create_graph(api_key, tavily_api_key)
+        self.config = {"configurable": {"thread_id": thread_id}}
 
     def handle_message(self, message: str):
         human_message = HumanMessage(content=message)
-        try:
-            response = self.graph.invoke({"messages": [human_message]})
-            return response["messages"][-1]
+        try:    
+            response = self.graph.invoke({"messages": [human_message]}, config=self.config)
+            if not response["messages"]:
+                raise ValueError("No response from graph")
+            last_message = response["messages"][-1]
+            if isinstance(last_message, AIMessage) and last_message.content:
+                return last_message.content
+            else:
+                raise ValueError("Last message is not an AIMessage")
 
-        except:
-            ValueError("No response from graph")
+        except Exception as e:
+            raise ValueError(f"Error: {e}")
     
     def get_history(self):
         try:
-            state = self.graph.get_state()
+            state = self.graph.get_state(config=self.config)
             return state.get("messages", [])
-        except:
-            ValueError("No history found")
+        except Exception as e:
+            raise ValueError(f"Error: {e}")
 
     def clear_history(self):
-        self.graph.reset()
+        self.graph.reset(config=self.config)
