@@ -19,18 +19,24 @@ class State(TypedDict):
 def chatbot(state: State, llm_with_tools):
     return {"messages": [llm_with_tools.invoke(state["messages"])]}
 
-def create_graph(api_key:str = None, tavily_api_key:str = None):
+def create_graph(api_key:str = None, tavily_api_key:str = None, use_openai:bool = False):
     if not api_key:
         raise ValueError("API keys are not provided")
     system_message = """You are a helpful assistant that can answer questions and help with tasks.
-    You are able to use the following tools:
-    - TavilySearch: to search the web for information"""
-
+    """
+    if tavily_api_key:
+        system_message += "\nYou are able to use the following tool: TavilySearch"
+        os.environ["TAVILY_API_KEY"] = tavily_api_key
+    
     graph_builder = StateGraph(State)
-    os.environ["TAVILY_API_KEY"] = tavily_api_key
+
+    if use_openai:  
+        model = "openai:gpt-4o-mini"
+    else:
+        model = "anthropic:claude-3-5-sonnet-latest"
 
     llm_call = init_chat_model(
-                            model="anthropic:claude-3-5-sonnet-latest",
+                            model=model,
                             temperature=0.0,
                             api_key=api_key,
     )
@@ -53,8 +59,8 @@ def create_graph(api_key:str = None, tavily_api_key:str = None):
     return graph_builder.compile(checkpointer=memory)
 
 class MessageHandler:
-    def __init__(self, thread_id:str = "1", api_key:str = None, tavily_api_key:str = None):
-        self.graph = create_graph(api_key, tavily_api_key)
+    def __init__(self, thread_id:str = "1", api_key:str = None, tavily_api_key:str = None, use_openai:bool = False):
+        self.graph = create_graph(api_key, tavily_api_key, use_openai)
         self.config = {"configurable": {"thread_id": thread_id}}
 
     def handle_message(self, message: str):

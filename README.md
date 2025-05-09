@@ -66,7 +66,7 @@ streamlit run app.py
 
 ## Future Improvements
 
-- [ ] Add OpenAI API support as an alternative
+- [x] Add OpenAI API support as an alternative
 - [x] Make Tavily Search optional
 - [ ] Enhance error handling
 - [ ] Improve GUI/UX

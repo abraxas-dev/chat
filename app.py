@@ -132,15 +132,18 @@ def chat_page():
     def initialize_message_handler():
         if st.session_state.message_handler is None:
             try:
-                if not anthropic_api_key.strip():
-                    st.error("Anthropic API key is required")
-                    return False
-                if anthropic_api_key:
-                    st.session_state.message_handler = MessageHandler(thread_id=st.session_state.session_id, api_key = anthropic_api_key.strip(), tavily_api_key = tavily_api_key.strip())
-                    return True
+                if openapi_api_key.strip():
+                    api_key = openapi_api_key.strip()
+                    use_openai = True
+                elif anthropic_api_key.strip():
+                    api_key = anthropic_api_key.strip()
+                    use_openai = False
                 else:
                     st.error("Please provide valid API keys for OpenAI or Anthropic and for Tavily.")
                     return False
+                
+                st.session_state.message_handler = MessageHandler(thread_id=st.session_state.session_id, api_key = api_key, tavily_api_key = tavily_api_key.strip(), use_openai = use_openai)
+                return True
                 
             except Exception as e:
                 st.error(f"Error Initializing AI Assistant: {e}")
