@@ -20,7 +20,7 @@ def chatbot(state: State, llm_with_tools):
     return {"messages": [llm_with_tools.invoke(state["messages"])]}
 
 def create_graph(api_key:str = None, tavily_api_key:str = None):
-    if not api_key or not tavily_api_key:
+    if not api_key:
         raise ValueError("API keys are not provided")
     system_message = """You are a helpful assistant that can answer questions and help with tasks.
     You are able to use the following tools:
@@ -34,9 +34,11 @@ def create_graph(api_key:str = None, tavily_api_key:str = None):
                             temperature=0.0,
                             api_key=api_key,
     )
-    
-    tool = TavilySearch(max_results=3)
-    tools = [tool]
+    tools = []
+    if tavily_api_key:
+        tool = TavilySearch(max_results=3)
+        tools = [tool]
+
     llm_with_tools = llm_call.bind_tools(tools)
     tool_node = ToolNode(tools=tools)
 

@@ -67,7 +67,7 @@ streamlit run app.py
 ## Future Improvements
 
 - [ ] Add OpenAI API support as an alternative
-- [ ] Make Tavily Search optional
+- [x] Make Tavily Search optional
 - [ ] Enhance error handling
 - [ ] Improve GUI/UX
 - [ ] Add Ollama support for local LLM usage

@@ -127,23 +127,15 @@ def chat_page():
         if not openapi_api_key and not anthropic_api_key:
             st.error("Please enter a valid API key for OpenAI or Anthropic.")
             return False
-        if not tavily_api_key:
-            st.error("Please enter a valid API key for Tavily.")
-            return False
         return True
     
     def initialize_message_handler():
         if st.session_state.message_handler is None:
             try:
-
-                if not tavily_api_key.strip():
-                    st.error("Tavily API key is required")
-                    return False
                 if not anthropic_api_key.strip():
                     st.error("Anthropic API key is required")
                     return False
-                
-                if anthropic_api_key and tavily_api_key:
+                if anthropic_api_key:
                     st.session_state.message_handler = MessageHandler(thread_id=st.session_state.session_id, api_key = anthropic_api_key.strip(), tavily_api_key = tavily_api_key.strip())
                     return True
                 else:
