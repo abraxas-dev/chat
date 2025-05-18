@@ -1,6 +1,7 @@
 # Minimal AI Agent with LangGraph and Streamlit
 
 A learning project exploring the capabilities of LangGraph for building AI agents and Streamlit for rapid UI development.
+**Note**: Forward development of this project will continue in my other application : )
 
 ## Interface Preview
 
@@ -18,7 +19,7 @@ A learning project exploring the capabilities of LangGraph for building AI agent
 
 ## Currently Features
 
-- 🤖 AI-powered chat interface using Anthropic's Claude model
+- 🤖 AI-powered chat interface using Anthropic's Claude / OpenAI model
 - 🔍 Web search capabilities via Tavily Search API
 - 💬 Real-time message streaming
 - 🎨 Clean, responsive UI built with Streamlit
@@ -43,7 +44,7 @@ pip install -r requirements.txt
 ```
 
 3. Set up your API keys:
-   - Get your Anthropic API key from [Anthropic Console](https://console.anthropic.com)
+   - Use your OpenAI API Key or get your Anthropic API key from [Anthropic Console](https://console.anthropic.com)
    - Get your Tavily API key from [Tavily AI](https://tavily.com)
 
 ## Usage
@@ -60,20 +61,9 @@ streamlit run app.py
 
 ## Important Notes
 
-- Both Anthropic API and Tavily Search API keys are required for the application to function
+- OpenAI API or Anthropic API and Tavily Search API keys are required for the application to function
 - The application uses Claude 3.5 Sonnet as the default model
 - Web search functionality is powered by Tavily Search API
-
-## Future Improvements
-
-- [x] Add OpenAI API support as an alternative
-- [x] Make Tavily Search optional
-- [ ] Enhance error handling
-- [ ] Improve GUI/UX
-- [ ] Add Ollama support for local LLM usage
-- [ ] Implement MCP (Model Control Protocol) support
-- [ ] Add conversation history management
-- [ ] Implement better state management
 
 ## Acknowledgments
 
