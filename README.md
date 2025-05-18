@@ -1,6 +1,7 @@
 # Minimal AI Agent with LangGraph and Streamlit
 
 A learning project exploring the capabilities of LangGraph for building AI agents and Streamlit for rapid UI development.
+
 **Note**: Forward development of this project will continue in my other application : )
 
 ## Interface Preview
